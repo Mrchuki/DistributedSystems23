@@ -1,0 +1,41 @@
+version: '3.1'
+services:
+  backend:
+    image: mrchuki/distributedsystems:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    environment:
+      - DATABASE_HOST=db
+      - DATABASE_USER=admin
+      - DATABASE_PASSWORD=1234
+      - DATABASE_NAME=mariadb
+      - DATABASE_PORT=5432
+
+  db:
+    image: mariadb:10.6.4-focal
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=mariadb
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=1234
+    expose:
+      - 3306
+      - 33060
+
+  phpmyadmin:
+    image: phpmyadmin
+    ports:
+      - 8081:80
+    environment:
+      - PMA_ARBITRARY=1
+      - UPLOAD_LIMIT=1G
+  
+  frontend:
+    image: mrchuki/distributedsystems_frontend:latest
+    ports:
+      - 80:80
+    environment:
+      - API_URL=https://backend:8080/api
